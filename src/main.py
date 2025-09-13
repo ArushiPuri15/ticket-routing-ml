@@ -13,10 +13,12 @@ including:
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from src.api import health, metrics
+from src.api import ticket_ml
 from src.core import monitoring, routing, auth
 from src.core.rate_limit import RateLimitMiddleware
 from src.core.logging import setup_logging, RequestLoggingMiddleware, get_logger
 from typing import AsyncGenerator
+
 
 # Set up logging as the very first step to ensure all subsequent events are logged.
 setup_logging()
@@ -69,7 +71,7 @@ app.include_router(metrics.router, prefix="/metrics", tags=["internal"])
 # Register the primary routing/proxy endpoints.
 app.include_router(routing.router, prefix="/api", tags=["proxy"])
 
-
+app.include_router(ticket_ml.router, prefix="/ml", tags=["ml"])
 # ---- Monitoring Setup ----
 # Configure monitoring and metrics collection for the application.
 monitoring.setup_metrics(app)

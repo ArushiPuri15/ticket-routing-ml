@@ -1,0 +1,6 @@
+text,category
+"My account is locked, cannot login",account
+"Charged twice this month",billing
+"The app crashes when I upload files",technical
+"Need to reset password",account
+"Refund not processed",billing
