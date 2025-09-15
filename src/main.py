@@ -11,6 +11,7 @@ including:
 """
 
 from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 from contextlib import asynccontextmanager
 from src.api import health, metrics
 from src.api import ticket_ml
@@ -78,3 +79,26 @@ monitoring.setup_metrics(app)
 
 # Log startup (outside lifespan, runs on import)
 logger.info("API Gateway started successfully")
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title=app.title,
+        version="1.0.0",
+        description="API Gateway with JWT Authentication",
+        routes=app.routes,
+    )
+    openapi_schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+        }
+    }
+    # Apply BearerAuth as default for all endpoints
+    openapi_schema["security"] = [{"BearerAuth": []}]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi

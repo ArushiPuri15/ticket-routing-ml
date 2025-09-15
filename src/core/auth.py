@@ -33,14 +33,21 @@ class AuthMiddleware(BaseHTTPMiddleware, LoggerMixin):
        """
        request_id = getattr(request.state, "request_id", "unknown")
        
-       # Skip authentication for internal endpoints
-       if request.url.path.startswith("/health") or request.url.path.startswith("/metrics"):
+              # Skip authentication for internal + docs endpoints
+       if (
+           request.url.path.startswith("/health")
+           or request.url.path.startswith("/metrics")
+           or request.url.path.startswith("/docs")
+           or request.url.path.startswith("/redoc")
+           or request.url.path.startswith("/openapi.json")
+       ):
            self.log_info(
-               "Skipping auth for internal endpoint",
+               "Skipping auth for internal/docs endpoint",
                request_id=request_id,
                path=request.url.path
            )
            return await call_next(request)
+
 
        # Check for Authorization header
        auth_header = request.headers.get("Authorization")
